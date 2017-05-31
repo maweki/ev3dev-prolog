@@ -30,6 +30,8 @@ expand_(F, E) :-
   expand_file_name(F, L),
   memberchk(E, L).
 
+% expand_(F, E) :- F = E.
+
 device_path(Port, DevicePath) :-
   Prefix = '/sys/bus/lego/devices/',
   device_code(Port, Code),
@@ -62,31 +64,44 @@ motorCommandFile(M, F) :-  :-
   device_path(Port, Basepath),
   atomic_concat(Basepath, 'command', File).
 
-setMotorSpeed(M, S) :-
+max_speed(MotorPort, Speed) :-
+  tacho_motor(MotorPort),
+  Speed = 100. % read this from max_speed-file
+
+speed(MotorPort, Speed) :-
+  ( integer(Speed),tacho_motor(MotorPort),
+    max_speed(MotorPort, MaxSpeed),!,
+    Speed <= MaxSpeed,
+    Speed >= -MaxSpeed,
+    set_motor_speed(MotorPort, Speed),
+    if(Speed == 0, set_motor_command(MotorPort, 'stop'), set_motor_command(MotorPort, 'run-forever'))
+  )
+
+set_motor_speed(M, S) :- % inline
   motor(M),
   motorSpeedFile(M, F),
   file_write(F, S).
 
-setMotorCommand(M, C) :-
-  motor(M),
+set_motor_command(M, C) :-  % inline
+  tacho_motor(M),
   motorCommandFile(M, F),
   file_write(F, C).
 
 startMotor(M) :-
-  motor(M),
-  setMotorCommand(M, 'run-forever').
+  tacho_motor(M),
+  set_motor_command(M, 'run-forever').
 
 stopMotor(M) :-
-  motor(M),
-  setMotorCommand(M, 'stop').
+  tacho_motor(M),
+  set_motor_command(M, 'stop').
 
 
 largeMotor(portA).
 mediumMotor(portB).
 
 main :-
-  setMotorSpeed(portA, 100),
-  setMotorSpeed(portB, 100),
+  set_motor_speed(portA, 100),
+  set_motor_speed(portB, 100),
   startMotor(portA),
   startMotor(portB),
   sleep(3),
