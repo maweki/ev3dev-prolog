@@ -1,16 +1,12 @@
+:- expects_dialect(sicstus).
+device_prefix('/sys/bus/lego/devices/').
+
 % Write Base ops
-write_(File, Content) :-
+file_write(File, Content) :-
   open(File, write, Stream),
   write(Stream, Content),
   flush_output(Stream),
   catch(close(Stream), _, true).
-
-write_dummy_(File, Content) :-
-  write('Dummywrote '),
-  write(Content),
-  write(' to '),
-  write(File),nl,
-  flush_output.
 
 % Pathnames for Device access
 
@@ -23,62 +19,80 @@ port_symbol(port2, 'in2').
 port_symbol(port3, 'in3').
 port_symbol(port4, 'in4').
 
-% expand_file_name(+WildCard, -List)
-% /sys/bus/lego/devices/outA:lego-ev3-l-motor/tacho-motor/motor0
+device_code(Port, Code) :-
+  (ev3_large_motor(Port), Code = 'lego-ev3-l-motor');
+  (ev3_medium_motor(Port), Code = 'lego-ev3-m-motor');
+  (nxt_motor(Port), Code = 'lego-nxt-motor').
 
+%! tacho_motor(?M:Port) is nondet
+%
+% True if a tacho Motor exists at that port
+%
+% @arg M Motor Port of the motor
+% @see "http://docs.ev3dev.org/projects/lego-linux-drivers/en/ev3dev-jessie/motors.html#tacho-motors"
+tacho_motor(M) :-
+  ev3_large_motor(M);
+  ev3_medium_motor(M);
+  nxt_motor(M).
+
+% Auto-Detect these
+% ev3_large_motor(Port) :- .
+% ev3_medium_motor(Port) :- .
+% nxt_motor(Port) :- .
+
+%! expand_(+F:Wildcard, -E:Path) is nondet
+%
+% expand a wildcard pattern and return one match
+%
+% @arg F wildcard pattern
+% @arg E single path matching wildcard
 expand_(F, E) :-
   expand_file_name(F, L),
   memberchk(E, L).
 
-% expand_(F, E) :- F = E.
-
 device_path(Port, DevicePath) :-
-  Prefix = '/sys/bus/lego/devices/',
+  device_prefix(Prefix),
   device_code(Port, Code),
   port_symbol(Port, Symbol),
   ( tacho_motor(Port),
     atomic_concat(Prefix, Symbol, C1),
     atomic_concat(C1, ':', C2),
     atomic_concat(C2, Code, C3),
-    atomic_concat(C3, '/tacho-motor/motor*/', WildCard),
+    atomic_concat(C3, '/tacho-motor/motor*', WildCard),
     expand_(WildCard, DevicePath)
   ).
-
-device_code(Port, Code) :-
-  (largeMotor(Port), Code = 'lego-ev3-l-motor').
-
-tacho_motor(M) :-
-  largeMotor(M);
-  mediumMotor(M).
-
-file_write(File, Content) :- write_dummy_(File, Content).
-% file_write(File, Content) :- write_(File, Content).
 
 motorSpeedFile(Port, File) :-
   tacho_motor(Port),
   device_path(Port, Basepath),
-  atomic_concat(Basepath, 'speed_sp', File).
+  atomic_concat(Basepath, '/speed_sp', File).
 
-motorCommandFile(M, F) :-  :-
+motorCommandFile(Port, File) :-
   tacho_motor(Port),
   device_path(Port, Basepath),
-  atomic_concat(Basepath, 'command', File).
+  atomic_concat(Basepath, '/command', File).
 
 max_speed(MotorPort, Speed) :-
   tacho_motor(MotorPort),
-  Speed = 100. % read this from max_speed-file
+  Speed = 1000. % read this from max_speed-file
 
-speed(MotorPort, Speed) :-
-  ( integer(Speed),tacho_motor(MotorPort),
+speed_sp(MotorPort, Speed) :- % this implementation evokes the action
+  integer(Speed),
+  ( tacho_motor(MotorPort),
     max_speed(MotorPort, MaxSpeed),!,
-    Speed <= MaxSpeed,
+    MaxSpeed >= Speed,
     Speed >= -MaxSpeed,
     set_motor_speed(MotorPort, Speed),
     if(Speed == 0, set_motor_command(MotorPort, 'stop'), set_motor_command(MotorPort, 'run-forever'))
-  )
+  ).
+
+speed_sp(MotorPort, Speed) :- % this implementation reads the target speed
+  var(Speed), Speed = 0.
+
+
 
 set_motor_speed(M, S) :- % inline
-  motor(M),
+  tacho_motor(M),
   motorSpeedFile(M, F),
   file_write(F, S).
 
@@ -97,13 +111,11 @@ stopMotor(M) :-
 
 
 largeMotor(portA).
-mediumMotor(portB).
+largeMotor(portB).
 
 main :-
-  set_motor_speed(portA, 100),
-  set_motor_speed(portB, 100),
-  startMotor(portA),
-  startMotor(portB),
+  speed(portA, 100),
+  speed(portB, -200),
   sleep(3),
-  stopMotor(portA),
-  stopMotor(portB).
+  speed(portA, 0),
+  speed(portB, 0).
