@@ -8,6 +8,15 @@ file_write(File, Content) :-
   flush_output(Stream),
   catch(close(Stream), _, true).
 
+file_read(File, Content) :-
+  open(File, read, Stream),
+  read_line(Stream, C),
+  atom_string(Ca, C),
+  ( atom_number(Ca, Content);
+    Content = Ca
+  ),
+  catch(close(Stream), _, true).
+
 % Pathnames for Device access
 
 port_symbol(portA, 'outA').
@@ -55,14 +64,14 @@ device_path(Port, DevicePath) :-
   device_code(Port, Code),
   port_symbol(Port, Symbol),
   ( tacho_motor(Port),
-    atomic_concat(Prefix, Symbol, C1),
+    atomic_concat(Prefix, Symbol, C1), % atomic_list_concat(+List, -Atom)
     atomic_concat(C1, ':', C2),
     atomic_concat(C2, Code, C3),
     atomic_concat(C3, '/tacho-motor/motor*', WildCard),
     expand_(WildCard, DevicePath)
   ).
 
-motorSpeedFile(Port, File) :-
+filename_motor_speed_sp(Port, File) :-
   tacho_motor(Port),
   device_path(Port, Basepath),
   atomic_concat(Basepath, '/speed_sp', File).
@@ -82,21 +91,19 @@ speed_sp(MotorPort, Speed) :- % this implementation evokes the action
     max_speed(MotorPort, MaxSpeed),!,
     MaxSpeed >= Speed,
     Speed >= -MaxSpeed,
-    set_motor_speed(MotorPort, Speed),
-    if(Speed == 0, set_motor_command(MotorPort, 'stop'), set_motor_command(MotorPort, 'run-forever'))
+    filename_motor_speed_sp(M, F),
+    file_write(F, Speed),
+    if(Speed == 0, motor_command(MotorPort, 'stop'), motor_command(MotorPort, 'run-forever'))
   ).
 
 speed_sp(MotorPort, Speed) :- % this implementation reads the target speed
-  var(Speed), Speed = 0.
+  var(Speed),
+  ( tacho_motor(MotorPort),
+    filename_motor_speed_sp(MotorPort, F),
+    file_read(F, Speed),
+  ).
 
-
-
-set_motor_speed(M, S) :- % inline
-  tacho_motor(M),
-  motorSpeedFile(M, F),
-  file_write(F, S).
-
-set_motor_command(M, C) :-  % inline
+motor_command(M, C) :-  % inline
   tacho_motor(M),
   motorCommandFile(M, F),
   file_write(F, C).
