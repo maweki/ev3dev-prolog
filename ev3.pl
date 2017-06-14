@@ -31,7 +31,6 @@ port_symbol(port4, 'in4').
 ev3_large_motor(_) :- false.
 ev3_medium_motor(_) :- false.
 nxt_motor(_) :- false.
-uart_host(_) :- false.
 light_sensor(_) :- false.
 
 device_code(Port, Code) :-
