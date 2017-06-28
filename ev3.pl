@@ -92,6 +92,11 @@ col_ambient(Port, Val) :-
   mode(Port, 'COL-AMBIENT'),
   value(Port, 0, Val).
 
+col_reflect(Port, Val) :-
+  light_sensor(Port),
+  mode(Port, 'COL-REFLECT'),
+  value(Port, 0, Val).
+
 filename_motor_speed_sp(Port, File) :-
   tacho_motor(Port),
   device_path(Port, Basepath),
