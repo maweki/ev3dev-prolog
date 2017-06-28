@@ -176,8 +176,8 @@ stop_motor(M) :-
   command(M, 'stop').
 
 
-ev3_large_motor(portA).
-ev3_large_motor(portD).
+ev3_large_motor(portB).
+ev3_large_motor(portC).
 light_sensor(port2).
 light_sensor(port3).
 
@@ -186,7 +186,7 @@ light_sensor(port3).
 % BRAITENBERG
 
 normalized(X, Y) :- Y is X * 5.
-speed_back_when (X,Y) :- X > 50, Y is X *(-1).
+speed_back_when(X,Y) :- X > 50, Y is X *(-1).
 speed_power(X,Y,Z) :- Y > 60, Z > 60, X is -900.
 speed_slower(X, Y, Z) :- X is Y - Z.
 speed_slower_when(X, Y, Z) :- Z > 50, X is Y - Z.
@@ -196,63 +196,65 @@ power(X, Y) :- X is Y.
 % Je mehr Licht desto schneller das Vehikel
 braitenberg1a :-
   col_ambient(port2, Light),
-  normalized(Light, A),
-  speed_sp(portA, A),
-  speed_sp(portD, A),
+  speed_sp(portB, Light, true),
+  speed_sp(portC, Light, true),
   braitenberg1a.
 
 % Licht wird nur von einem der beiden Sensoren verwendet und auf beide motoren übertragen.
 % Je mehr licht um so schneller, wenn Licht > 50 sollte das Vehikel rückwärts fahren.
 braitenberg1b :-
   col_ambient(port2, Light),
-  normalized(Light, B),
-  speed_back_when(B, S),
-  speed_sp(portA, S),
-  speed_sp(portD, S),
+  ((Light < 50,
+    Speed is Light);
+    Speed is -Light),
+  speed_sp(portB, Speed, true),
+  speed_sp(portC, Speed, true),
   braitenberg1b.
 
 braitenberg1c :-
   col_ambient(port2, Light),
-  normalized(Light, S)
-  speed_slower_when(speed_s, 500, S),
-  speed_back_when(S, speed_s),
-  speed_sp(portA, speed_s),
-  speed_sp(portD, speed_s),
+  Speed is 50 - Light,
+  speed_sp(portB, Speed, true),
+  speed_sp(portC, Speed, true),
   braitenberg1c.
 
 % Je mehr Licht desto schneller das Vehikel, Motor Sensor Abhänigkeit
 % Für braitenberg2b, am Roboter Ports von Motoren ODER Sensoren tauschen
-braitenberg2a :-
-  col_ambient(port2, LightR), normalized(LightR, R), speed_sp(portA, R),
-  col_ambient(port3, LightL), normalized(LightL, L), speed_sp(portD, L),
-  braitenberg2a.
+braitenberg2 :-
+  col_ambient(port2, LightR), speed_sp(portB, LightR, true),
+  col_ambient(port3, LightL), speed_sp(portC, LightL, true),
+  braitenberg2.
 
 % Je mehr Licht desto langsamer das Vehikel, Motor Sensor Abhänigkeit
 % Für braitenberg3b, am Roboter Ports von Motoren ODER Sensoren tauschen
-braitenberg3a :-
-  col_ambient(port2, LightR), normalized(LightR, R), speed_slower(speed_R, 100, R),  speed_sp(portA, speed_R),
-  col_ambient(port3, LightL), normalized(LightL, L), speed_slower(speed_L, 100, L),  speed_sp(portD, speed_L),
-  braitenberg3a.
+braitenberg3 :-
+  col_ambient(port2, LightR), SpeedR is max(0, 50 - LightR),
+  col_ambient(port3, LightL), SpeedL is max(0, 50 - LightL),
+  speed_sp(portB, SpeedR, true), speed_sp(portC, SpeedL, true),
+  braitenberg3.
 
 %Je mehr Licht umso schneller bis Licht > 50, dann je mehr Licht langsamer
 braitenberg4 :-
-  col_ambient(port2, LightR), normalized(LightR, R),
-  col_ambient(port3, LightL), normalized(LightL, L),
-  speed_slower_when(speed_R, R, LightR), speed_sp(portA, speed_R),
-  speed_slower_when(speed_L, L, LightL), speed_sp(portD, speed_L),
-  speed_sp(portA, R),
-  speed_sp(portD, L),
+  col_ambient(port2, LightR),
+  col_ambient(port3, LightL),
+  ((LightR < 50,
+    SpeedR is LightR^2 / 100.0);
+    SpeedR is 50 - LightR^2 / 100.0
+  ),
+  ((LightL < 50,
+    SpeedL is LightL^2 / 100.0);
+    SpeedL is 50 - LightL^2 / 100.0
+  ),
+  speed_sp(portB, SpeedR, true), speed_sp(portC, SpeedL, true),
 braitenberg4.
 
 % Vehikel fährt mit konstanter Geschwindigkeit(100), bis Licht > 60, dann Motor(en) (fast) volle Leistung rückwärts
 braitenberg5 :-
-  power(P, 100),
   col_ambient(port2, LightR),
-  normalized(LightR, R)
   col_ambient(port3, LightL),
-  normalized(LightL, L)
-  speed_power(P, R, L),
-  speed_sp(portA, P),
-  speed_sp(portD, P),
-  sleep(1),
+  ((LightR > 50, SpeedR is 100);
+    SpeedR is 40),
+  ((LightL > 50, SpeedL is 100);
+    SpeedL is 40),
+  speed_sp(portB, SpeedL, true), speed_sp(portC, SpeedR, true), sleep(1),
 braitenberg5.
