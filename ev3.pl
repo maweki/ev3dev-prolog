@@ -32,6 +32,7 @@ ev3_large_motor(_) :- false.
 ev3_medium_motor(_) :- false.
 nxt_motor(_) :- false.
 light_sensor(_) :- false.
+ultrasonic_sensor(_) :- false.
 
 device_code(Port, Code) :-
   (ev3_large_motor(Port), Code = 'lego-ev3-l-motor');
@@ -51,7 +52,8 @@ tacho_motor(M) :-
   nxt_motor(M).
 
 uart_host(Port) :-
-  light_sensor(Port).
+  light_sensor(Port);
+  ultrasonic_sensor(Port).
 
 % Auto-Detect these
 % ev3_large_motor(Port) :- .
@@ -96,6 +98,12 @@ col_reflect(Port, Val) :-
   light_sensor(Port),
   mode(Port, 'COL-REFLECT'),
   value(Port, 0, Val).
+
+us_dist_cm(Port, Val) :-
+  ultrasonic_sensor(Port),
+  mode(Port, 'US-DIST-CM'),
+  value(Port, 0, RawVal),
+  Val is RawVal / 10.0. % sollte aus /decimals ausgelesen werden
 
 filename_motor_speed_sp(Port, File) :-
   tacho_motor(Port),
