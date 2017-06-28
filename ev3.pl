@@ -140,7 +140,7 @@ command(M, C) :-  % inline
 
 max_speed(MotorPort, Speed) :-
   tacho_motor(MotorPort),
-  Speed = 1000. % read this from max_speed-file
+  Speed = 1050. % read this from max_speed-file
 
 speed_sp(MotorPort, Speed) :- % this implementation evokes the action
   integer(Speed),
@@ -159,6 +159,13 @@ speed_sp(MotorPort, Speed) :- % this implementation reads the target speed
     filename_motor_speed_sp(MotorPort, F),
     file_read(F, Speed)
   ).
+
+speed_sp(MotorPort, Speed, Percent) :-
+  Percent,!,
+  (float(Speed); integer(Speed)),
+  max_speed(MotorPort, MaxSpeed),
+  CalcSpeed is floor(Speed / 100.0 * MaxSpeed),
+  speed_sp(MotorPort, CalcSpeed).
 
 start_motor(M) :-
   tacho_motor(M),
