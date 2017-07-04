@@ -180,7 +180,7 @@ ev3_large_motor(portB).
 ev3_large_motor(portC).
 light_sensor(port2).
 light_sensor(port3).
-
+ultrasonic_sensor(port1).
 
 
 % BRAITENBERG
@@ -258,3 +258,9 @@ braitenberg5 :-
     SpeedL is 40),
   speed_sp(portB, SpeedL, true), speed_sp(portC, SpeedR, true), sleep(1),
 braitenberg5.
+
+obstacle_avoidance :-
+  ( us_dist_cm(port1, Dist), Dist > 50,
+    speed_sp(portB, 50, true), speed_sp(portB, 50, true)
+  );
+  speed_sp(portB, 0), obstacle_avoidance.
