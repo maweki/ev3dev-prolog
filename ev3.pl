@@ -166,6 +166,8 @@ stop_motor(M) :-
   tacho_motor(M),
   command(M, 'stop').
 
+stop_all :-
+  foreach(tacho_motor(M), stop_motor(M)).
 
 ev3_large_motor(portB).
 ev3_large_motor(portC).
