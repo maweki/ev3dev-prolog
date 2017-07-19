@@ -1,5 +1,4 @@
 :- expects_dialect(sicstus).
-device_prefix('/sys/bus/lego/devices/').
 
 % Write Base ops
 file_write(File, Content) :-
@@ -71,23 +70,15 @@ expand_(F, E) :-
   member(E, L).
 
 device_path(Port, DevicePath) :-
-  device_prefix(Prefix),
-  device_code(Port, Code),
   port_symbol(Port, Symbol),
-  ( tacho_motor(Port),
-    atomic_concat(Prefix, Symbol, C1), % atomic_list_concat(+List, -Atom)
-    atomic_concat(C1, ':', C2),
-    atomic_concat(C2, Code, C3),
-    atomic_concat(C3, '/tacho-motor/motor*', WildCard),
-    expand_(WildCard, DevicePath)
-  );
-  ( uart_host(Port),
-    expand_('/sys/class/lego-sensor/sensor*/address', AddressFile),
-    file_read(AddressFile, Content),
-    port_symbol(Port, Symbol),
-    Content = Symbol,!,
-    file_directory_name(AddressFile, DevicePath)
-  ).
+  ((tacho_motor(Port),
+    expand_('/sys/class/tacho-motor/motor*/address', AddressFile)
+   );
+   (uart_host(Port),
+    expand_('/sys/class/lego-sensor/sensor*/address', AddressFile)
+   )),
+  file_read(AddressFile, Content), Content = Symbol, !,
+  file_directory_name(AddressFile, DevicePath).
 
 col_ambient(Port, Val) :-
   light_sensor(Port),
@@ -183,15 +174,6 @@ light_sensor(port3).
 ultrasonic_sensor(port1).
 
 
-% BRAITENBERG
-
-normalized(X, Y) :- Y is X * 5.
-speed_back_when(X,Y) :- X > 50, Y is X *(-1).
-speed_power(X,Y,Z) :- Y > 60, Z > 60, X is -900.
-speed_slower(X, Y, Z) :- X is Y - Z.
-speed_slower_when(X, Y, Z) :- Z > 50, X is Y - Z.
-power(X, Y) :- X is Y.
-
 % Licht wird nur von einem der beiden Sensoren verwendet und auf beide motoren übertragen.
 % Je mehr Licht desto schneller das Vehikel
 braitenberg1a :-
@@ -260,7 +242,8 @@ braitenberg5 :-
 braitenberg5.
 
 obstacle_avoidance :-
-  ( us_dist_cm(port1, Dist), Dist > 50,
-    speed_sp(portB, 50, true), speed_sp(portB, 50, true)
+  ((us_dist_cm(port1, Dist), Dist > 50,
+    speed_sp(portB, 50, true), speed_sp(portC, 50, true)
   );
-  speed_sp(portB, 0), obstacle_avoidance.
+  speed_sp(portB, 0)),
+  obstacle_avoidance.
