@@ -96,7 +96,7 @@ us_dist_cm(Port, Val) :-
   value(Port, 0, RawVal),
   Val is RawVal / 10.0. % sollte aus /decimals ausgelesen werden
 
-filename_motor_speed_sp(Port, File) :-
+speed_sp_file(Port, File) :-
   tacho_motor(Port),
   device_path(Port, Basepath),
   atomic_concat(Basepath, '/speed_sp', File).
@@ -139,7 +139,7 @@ speed_sp(MotorPort, Speed) :- % this implementation evokes the action
     max_speed(MotorPort, MaxSpeed),!,
     MaxSpeed >= Speed,
     Speed >= -MaxSpeed,
-    filename_motor_speed_sp(MotorPort, F),
+    speed_sp_file(MotorPort, F),
     file_write(F, Speed),
     if(Speed == 0, command(MotorPort, 'stop'), command(MotorPort, 'run-forever'))
   ).
@@ -147,7 +147,7 @@ speed_sp(MotorPort, Speed) :- % this implementation evokes the action
 speed_sp(MotorPort, Speed) :- % this implementation reads the target speed
   var(Speed),
   ( tacho_motor(MotorPort),
-    filename_motor_speed_sp(MotorPort, F),
+    speed_sp_file(MotorPort, F),
     file_read(F, Speed)
   ).
 
