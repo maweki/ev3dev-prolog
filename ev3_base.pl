@@ -140,8 +140,7 @@ speed_sp(MotorPort, Speed) :- % this implementation evokes the action
     MaxSpeed >= Speed,
     Speed >= -MaxSpeed,
     speed_sp_file(MotorPort, F),
-    file_write(F, Speed),
-    if(Speed == 0, command(MotorPort, 'stop'), command(MotorPort, 'run-forever'))
+    file_write(F, Speed)
   ).
 
 speed_sp(MotorPort, Speed) :- % this implementation reads the target speed
