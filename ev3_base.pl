@@ -129,9 +129,14 @@ command(M, C) :-  % inline
   command_file(M, F),
   file_write(F, C).
 
+max_speed_file(Port, File) :-
+  tacho_motor(Port),
+  device_path(Port, Basepath),
+  atomic_concat(Basepath, '/max_speed', File).
+
 max_speed(MotorPort, Speed) :-
-  tacho_motor(MotorPort),
-  Speed = 1050. % read this from max_speed-file
+  max_speed_file(MotorPort, File),
+  file_read(File, Speed).
 
 speed_sp(MotorPort, Speed) :- % this implementation evokes the action
   integer(Speed),
