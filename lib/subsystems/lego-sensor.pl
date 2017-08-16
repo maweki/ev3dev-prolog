@@ -18,12 +18,24 @@ col_reflect(Port, Val) :-
   mode(Port, 'COL-REFLECT'),
   value(Port, 0, Val).
 
+adjust_val(Port, RawVal, ValAdjusted) :-
+  decimals(Port, Decimals),
+  ValAdjusted is RawVal / 10.0**Decimals.
+
 us_dist_cm(Port, Val) :-
   ultrasonic_sensor(Port),
   mode(Port, 'US-DIST-CM'),
   value(Port, 0, RawVal),
-  Val is RawVal / 10.0. % sollte aus /decimals ausgelesen werden
+  adjust_val(Port, RawVal, Val).
 
+decimals(Port, Decimals) :-
+  decimals_file(Port, File),
+  file_read(File, Decimals).
+
+decimals_file(Port, File) :-
+  uart_host(Port),
+  device_path(Port, Basepath),
+  atomic_concat(Basepath, '/decimals', File).
 
 mode_file(Port, File) :-
   uart_host(Port),
