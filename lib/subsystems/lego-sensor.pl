@@ -1,9 +1,11 @@
 light_sensor(_) :- false.
 ultrasonic_sensor(_) :- false.
+gyro_sensor(_) :- false.
 
 uart_host(Port) :-
   light_sensor(Port);
-  ultrasonic_sensor(Port).
+  ultrasonic_sensor(Port);
+  gyro_sensor(Port).
 
 device_path(Port, DevicePath) :-
   device_path(Port, '/sys/class/lego-sensor/sensor', DevicePath).
@@ -33,6 +35,22 @@ col_rgb_raw(Port, R, G, B) :-
   value(Port, 0, R),
   value(Port, 1, G),
   value(Port, 2, B).
+
+gyro_ang(Port, Val) :-
+  gyro_sensor(Port),
+  mode(Port, 'GYRO-G&A'),
+  value(Port, 0, Val).
+
+gyro_rate(Port, Val) :-
+  gyro_sensor(Port),
+  mode(Port, 'GYRO-G&A'),
+  value(Port, 1, Val).
+
+gyro_reset(Port) :-
+  gyro_sensor(Port),
+  mode(Port, 'GYRO-ANG'),
+  mode(Port, 'GYRO-G&A').
+
 
 adjust_val(Port, RawVal, ValAdjusted) :-
   decimals(Port, Decimals),
