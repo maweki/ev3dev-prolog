@@ -18,6 +18,22 @@ col_reflect(Port, Val) :-
   mode(Port, 'COL-REFLECT'),
   value(Port, 0, Val).
 
+col_color(Port, Val) :-
+  light_sensor(Port),
+  mode(Port, 'COL-COLOR'),
+  value(Port, 0, Val).
+
+%mit Liste
+col_rgb_raw(Port, [R, G, B]) :-
+  col_rgb_raw(Port, R, G, B).
+%mit drei Werten
+col_rgb_raw(Port, R, G, B) :-
+  light_sensor(Port),
+  mode(Port, 'RGB-RAW'),
+  value(Port, 0, R),
+  value(Port, 1, G),
+  value(Port, 2, B).
+
 adjust_val(Port, RawVal, ValAdjusted) :-
   decimals(Port, Decimals),
   ValAdjusted is RawVal / 10.0**Decimals.
