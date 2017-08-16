@@ -44,6 +44,17 @@ us_dist_cm(Port, Val) :-
   value(Port, 0, RawVal),
   adjust_val(Port, RawVal, Val).
 
+us_dist_inches(Port, Val) :-
+  ultrasonic_sensor(Port),
+  mode(Port, 'US-DIST-IN'),
+  value(Port, 0, RawVal),
+  adjust_val(Port, RawVal, Val).
+
+us_listen(Port, Val) :-
+  ultrasonic_sensor(Port),
+  mode(Port, 'US-LISTEN'),
+  value(Port, 0, Val).
+
 decimals(Port, Decimals) :-
   decimals_file(Port, File),
   file_read(File, Decimals).
