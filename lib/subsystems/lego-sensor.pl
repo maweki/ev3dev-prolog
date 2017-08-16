@@ -52,6 +52,12 @@ value(Port, ValueNum, Value) :-
   value_file(Port, ValueNum, File),
   file_read(File, Value).
 
-mode(M, C) :- % also read variant
-  mode_file(M, F),
+mode(D, C) :-
+  nonvar(C),
+  mode_file(D, F),
   file_write(F, C).
+
+mode(D, C) :-
+  var(C),
+  mode_file(D, F),
+  file_read(F, C).
