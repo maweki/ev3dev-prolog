@@ -18,12 +18,15 @@ tacho_motor(M) :-
   ev3_medium_motor(M);
   nxt_motor(M).
 
-ev3_large_motor(M) :-
-  expand_('/sys/class/tacho-motor/motor*/', Basepath),
+detect_port(Port, Prefix, DriverName) :-
+  atomic_concat(Prefix, '*/', Template),
+  expand_(Template, Basepath),
   atomic_concat(Basepath, '/address', AddressFile),
   atomic_concat(Basepath, '/driver_name', DriverFile),
-  file_read(DriverFile, 'lego-ev3-l-motor'),
-  file_read(AddressFile, M).
+  file_read(DriverFile, DriverName),
+  file_read(AddressFile, Port).
+
+ev3_large_motor(M) :- detect_port(M, '/sys/class/tacho-motor/motor', 'lego-ev3-l-motor').
 
 device_path(Port, DevicePath) :-
   tacho_motor(Port),!,
