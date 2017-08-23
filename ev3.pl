@@ -6,6 +6,7 @@ motor_start(M) :-
 
 motor_stop(M) :-
   tacho_motor(M),
+  speed_sp(M, 0),
   command(M, 'stop').
 
 stop_all_motors :-
