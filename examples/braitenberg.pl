@@ -1,4 +1,7 @@
-consult('../ev3.pl').
+:- ['../lib/subsystems/lego-sensor.pl'].
+:- ['../lib/subsystems/tacho-motor.pl'].
+
+:- multifile ev3_large_motor/1.
 
 ev3_large_motor(portB).
 ev3_large_motor(portC).

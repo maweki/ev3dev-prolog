@@ -1,3 +1,7 @@
+:- multifile light_sensor/1, ultrasonic_sensor/1, gyro_sensor/1, device_path/2.
+:- dynamic   light_sensor/1, ultrasonic_sensor/1, gyro_sensor/1.
+:- ['../fileaccess.pl'].
+
 light_sensor(_) :- false.
 ultrasonic_sensor(_) :- false.
 gyro_sensor(_) :- false.
@@ -8,6 +12,7 @@ uart_host(Port) :-
   gyro_sensor(Port).
 
 device_path(Port, DevicePath) :-
+  uart_host(Port),!,
   device_path(Port, '/sys/class/lego-sensor/sensor', DevicePath).
 
 col_ambient(Port, Val) :-

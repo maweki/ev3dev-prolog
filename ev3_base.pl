@@ -1,5 +1,5 @@
 % import subsystems
-consult('subsystems/dc-motor.pl').
-consult('subsystems/lego-sensor.pl').
-consult('subsystems/servo-motor.pl').
-consult('subsystems/tacho-motor.pl').
+:- ['lib/subsystems/dc-motor.pl',
+ 'lib/subsystems/lego-sensor.pl',
+ 'lib/subsystems/servo-motor.pl',
+ 'lib/subsystems/tacho-motor.pl'].

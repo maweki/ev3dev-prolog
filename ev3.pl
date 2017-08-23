@@ -1,4 +1,4 @@
-consult('ev3_base.pl').
+:- ['ev3_base.pl'].
 
 motor_start(M) :-
   tacho_motor(M),
@@ -9,7 +9,7 @@ motor_stop(M) :-
   command(M, 'stop').
 
 stop_all_motors :-
-  foreach(tacho_motor(M), stop_motor(M)).
+  foreach(tacho_motor(M), motor_stop(M)).
 
 motor_run(Motor, Speed) :- run_forever(Motor, Speed).
 

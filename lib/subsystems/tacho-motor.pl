@@ -1,5 +1,6 @@
-consult('../ev3dev.pl').
-consult('../fileaccess.pl').
+:- multifile ev3_large_motor/1, ev3_medium_motor/1, nxt_motor/1, device_path/2.
+:- dynamic   ev3_large_motor/1, ev3_medium_motor/1, nxt_motor/1.
+:- ['../fileaccess.pl'].
 
 ev3_large_motor(_) :- false.
 ev3_medium_motor(_) :- false.
@@ -17,6 +18,7 @@ tacho_motor(M) :-
   nxt_motor(M).
 
 device_path(Port, DevicePath) :-
+  tacho_motor(Port),!,
   device_path(Port, '/sys/class/tacho-motor/motor', DevicePath).
 
 speed_sp_file(Port, File) :-
