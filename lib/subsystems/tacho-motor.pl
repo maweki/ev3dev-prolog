@@ -64,9 +64,6 @@ speed_sp(MotorPort, Speed) :- % this implementation reads the target speed
     file_read(F, Speed)
   ).
 
-speed_sp(MotorPort, Speed, Percent) :-
-  Percent,!,
-  (float(Speed); integer(Speed)),
+speed_adjust(PercentVal, MotorPort, Speed) :-
   max_speed(MotorPort, MaxSpeed),
-  CalcSpeed is floor(Speed / 100.0 * MaxSpeed),
-  speed_sp(MotorPort, CalcSpeed).
+  Speed is floor(PercentVal / 100.0 * MaxSpeed).

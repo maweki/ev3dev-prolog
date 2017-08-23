@@ -12,7 +12,9 @@ motor_stop(M) :-
 stop_all_motors :-
   foreach(tacho_motor(M), motor_stop(M)).
 
-motor_run(Motor, Speed) :- run_forever(Motor, Speed).
+motor_run(Motor, Speed) :-
+  speed_adjust(Speed, Motor, CSpeed),
+  run_forever(Motor, CSpeed).
 
 run_forever(Motor, Speed) :-
   tacho_motor(Motor),
