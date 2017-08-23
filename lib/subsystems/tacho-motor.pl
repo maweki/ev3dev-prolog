@@ -1,6 +1,7 @@
 :- multifile ev3_large_motor/1, ev3_medium_motor/1, nxt_motor/1, device_path/2.
 :- dynamic   ev3_large_motor/1, ev3_medium_motor/1, nxt_motor/1.
 :- ['../fileaccess.pl'].
+:- ['../ev3dev.pl'].
 
 ev3_large_motor(_) :- false.
 ev3_medium_motor(_) :- false.
@@ -16,6 +17,13 @@ tacho_motor(M) :-
   ev3_large_motor(M);
   ev3_medium_motor(M);
   nxt_motor(M).
+
+ev3_large_motor(M) :-
+  expand_('/sys/class/tacho-motor/motor*/', Basepath),
+  atomic_concat(Basepath, '/address', AddressFile),
+  atomic_concat(Basepath, '/driver_name', DriverFile),
+  file_read(DriverFile, 'lego-ev3-l-motor'),
+  file_read(AddressFile, M).
 
 device_path(Port, DevicePath) :-
   tacho_motor(Port),!,
