@@ -10,6 +10,10 @@ lego_sensor(Port) :-
   ev3_uart(Port);
   nxt_i2c(Port).
 
+lego_sensor(Port, Type) :-
+  lego_sensor(Port),
+  detect_port(Port, Type).
+
 nxt_i2c(_) :-
   false.
 

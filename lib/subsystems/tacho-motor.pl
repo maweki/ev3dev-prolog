@@ -13,6 +13,10 @@ tacho_motor(M) :-
   ev3_medium_motor(M);
   nxt_motor(M).
 
+tacho_motor(M, Type) :-
+  tacho_motor(M),
+  detect_port(M, Type).
+
 detect_port(Port, DriverName) :-
   detect_port(Port, '/sys/class/tacho-motor/motor', DriverName).
 
