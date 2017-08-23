@@ -1,32 +1,20 @@
-:- multifile ev3_large_motor/1, ev3_medium_motor/1, nxt_motor/1, device_path/2.
+:- multifile ev3_large_motor/1, ev3_medium_motor/1, nxt_motor/1, device_path/2, detect_port/2.
 :- dynamic   ev3_large_motor/1, ev3_medium_motor/1, nxt_motor/1.
 :- ['../fileaccess.pl'].
 :- ['../ev3dev.pl'].
 
-ev3_large_motor(_) :- false.
-ev3_medium_motor(_) :- false.
-nxt_motor(_) :- false.
+% http://docs.ev3dev.org/projects/lego-linux-drivers/en/ev3dev-jessie/motors.html#tacho-motors
+ev3_large_motor(M) :- detect_port(M, 'lego-ev3-l-motor').
+ev3_medium_motor(M) :- detect_port(M, 'lego-ev3-m-motor').
+nxt_motor(M) :- detect_port(M, 'lego-nxt-motor').
 
-%! tacho_motor(?M:Port) is nondet
-%
-% True if a tacho Motor exists at that port
-%
-% @arg M Motor Port of the motor
-% @see "http://docs.ev3dev.org/projects/lego-linux-drivers/en/ev3dev-jessie/motors.html#tacho-motors"
 tacho_motor(M) :-
   ev3_large_motor(M);
   ev3_medium_motor(M);
   nxt_motor(M).
 
-detect_port(Port, Prefix, DriverName) :-
-  atomic_concat(Prefix, '*/', Template),
-  expand_(Template, Basepath),
-  atomic_concat(Basepath, '/address', AddressFile),
-  atomic_concat(Basepath, '/driver_name', DriverFile),
-  file_read(DriverFile, DriverName),
-  file_read(AddressFile, Port).
-
-ev3_large_motor(M) :- detect_port(M, '/sys/class/tacho-motor/motor', 'lego-ev3-l-motor').
+detect_port(Port, DriverName) :-
+  detect_port(Port, '/sys/class/tacho-motor/motor', DriverName).
 
 device_path(Port, DevicePath) :-
   tacho_motor(Port),!,

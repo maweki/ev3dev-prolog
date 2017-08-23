@@ -26,6 +26,14 @@ device_path(Port, Basepath, DevicePath) :-
   file_read(AddressFile, Content), Content = Symbol, !,
   file_directory_name(AddressFile, DevicePath).
 
+detect_port(Port, Prefix, DriverName) :-
+  atomic_concat(Prefix, '*/', Template),
+  expand_(Template, Basepath),
+  atomic_concat(Basepath, '/address', AddressFile),
+  atomic_concat(Basepath, '/driver_name', DriverFile),
+  file_read(DriverFile, DriverName),
+  file_read(AddressFile, Port).
+
 %! expand_(+F:Wildcard, -E:Path) is nondet
 %
 % expand a wildcard pattern and return one match
