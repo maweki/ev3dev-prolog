@@ -111,7 +111,8 @@ position(MotorPort, Position) :-
 state(MotorPort, State) :-
   tacho_motor(MotorPort),
   state_file(MotorPort, F),
-  file_read(F, State).
+  file_read(F, StateString),
+  split_string(StateString, " ", "", State).
 
 speed_adjust(PercentVal, MotorPort, Speed) :-
   max_speed(MotorPort, MaxSpeed),

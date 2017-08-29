@@ -23,7 +23,7 @@ motor_run(Motor, Speed, Angle) :-
   command(Motor, 'run-to-rel-pos'),
   repeat,
   state(Motor, State),
-  State \= 'running'.
+  \memberchk('running', State).
 
 run_forever(Motor, Speed) :-
   tacho_motor(Motor),
