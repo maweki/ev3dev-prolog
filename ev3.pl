@@ -25,12 +25,14 @@ motor_run(Motor, Speed, Angle) :-
 
 motor_wait_while(Motor, State) :-
   tacho_motor(Motor),
+  memberchk(State, ['running', 'ramping', 'holding', 'overloaded', 'stalled']),
   repeat,
   state(Motor, States),
   \+ memberchk(State, States),!.
 
 motor_wait_until(Motor, State) :-
   tacho_motor(Motor),
+  memberchk(State, ['running', 'ramping', 'holding', 'overloaded', 'stalled']),
   repeat,
   state(Motor, States),
   memberchk(State, States),!.
