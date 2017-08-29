@@ -112,7 +112,7 @@ state(MotorPort, State) :-
   tacho_motor(MotorPort),
   state_file(MotorPort, F),
   file_read(F, StateString),
-  split_string(StateString, " ", "", State).
+  atomic_list_concat(State, ' ', StateString).
 
 speed_adjust(PercentVal, MotorPort, Speed) :-
   max_speed(MotorPort, MaxSpeed),
