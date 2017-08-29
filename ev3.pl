@@ -21,9 +21,19 @@ motor_run(Motor, Speed, Angle) :-
   speed_sp(Motor, CSpeed),
   position_sp(Motor, Angle),
   command(Motor, 'run-to-rel-pos'),
+  motor_wait_while(Motor, 'running').
+
+motor_wait_while(Motor, State) :-
+  tacho_motor(Motor),
   repeat,
-  state(Motor, State),
-  \+ memberchk('running', State),!.
+  state(Motor, States),
+  \+ memberchk(State, States),!.
+
+motor_wait_until(Motor, State) :-
+  tacho_motor(Motor),
+  repeat,
+  state(Motor, States),
+  memberchk(State, States),!.
 
 run_forever(Motor, Speed) :-
   tacho_motor(Motor),
