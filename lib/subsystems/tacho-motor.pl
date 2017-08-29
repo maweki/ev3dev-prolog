@@ -49,6 +49,11 @@ command_file(Port, File) :-
   device_path(Port, Basepath),
   atomic_concat(Basepath, '/command', File).
 
+state_file(Port, File) :-
+  tacho_motor(Port),
+  device_path(Port, Basepath),
+  atomic_concat(Basepath, '/state', File).
+
 command(M, C) :-  % inline
   command_file(M, F),
   file_write(F, C).
@@ -102,6 +107,11 @@ position(MotorPort, Position) :-
   tacho_motor(MotorPort),
   position_file(MotorPort, F),
   file_read(F, Position).
+
+state(MotorPort, State) :-
+  tacho_motor(MotorPort),
+  state_file(MotorPort, F),
+  file_read(F, State).
 
 speed_adjust(PercentVal, MotorPort, Speed) :-
   max_speed(MotorPort, MaxSpeed),

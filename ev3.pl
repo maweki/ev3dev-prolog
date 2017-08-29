@@ -20,7 +20,10 @@ motor_run(Motor, Speed, Angle) :-
   speed_adjust(Speed, Motor, CSpeed),
   speed_sp(Motor, CSpeed),
   position_sp(Motor, Angle),
-  command(Motor, 'run-to-rel-pos').
+  command(Motor, 'run-to-rel-pos'),
+  repeat,
+  state(Motor, State),
+  State \= 'running'.
 
 run_forever(Motor, Speed) :-
   tacho_motor(Motor),
