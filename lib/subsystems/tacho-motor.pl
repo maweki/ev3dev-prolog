@@ -29,6 +29,21 @@ speed_sp_file(Port, File) :-
   device_path(Port, Basepath),
   atomic_concat(Basepath, '/speed_sp', File).
 
+speed_file(Port, File) :-
+  tacho_motor(Port),
+  device_path(Port, Basepath),
+  atomic_concat(Basepath, '/speed', File).
+
+position_sp_file(Port, File) :-
+  tacho_motor(Port),
+  device_path(Port, Basepath),
+  atomic_concat(Basepath, '/position_sp', File).
+
+position_file(Port, File) :-
+  tacho_motor(Port),
+  device_path(Port, Basepath),
+  atomic_concat(Basepath, '/position', File).
+
 command_file(Port, File) :-
   tacho_motor(Port),
   device_path(Port, Basepath),
@@ -63,6 +78,30 @@ speed_sp(MotorPort, Speed) :- % this implementation reads the target speed
     speed_sp_file(MotorPort, F),
     file_read(F, Speed)
   ).
+
+speed(MotorPort, Speed) :-
+  tacho_motor(MotorPort),
+  speed_file(MotorPort, F),
+  file_read(F, Speed).
+
+position_sp(MotorPort, Position) :-
+  integer(Position),
+  ( tacho_motor(MotorPort),
+    position_sp_file(MotorPort, F),
+    file_write(F, Position)
+  ).
+
+position_sp(MotorPort, Position) :-
+  var(Position),
+  ( tacho_motor(MotorPort),
+    position_sp_file(MotorPort, F),
+    file_read(F, Position)
+  ).
+
+position(MotorPort, Position) :-
+  tacho_motor(MotorPort),
+  position_file(MotorPort, F),
+  file_read(F, Position).
 
 speed_adjust(PercentVal, MotorPort, Speed) :-
   max_speed(MotorPort, MaxSpeed),
