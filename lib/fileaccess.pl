@@ -1,5 +1,8 @@
 :- ['ev3dev.pl'].
 
+:- dynamic(device_path/3).
+:- dynamic(detect_port/3).
+
 % Write Base ops
 file_write(File, Content) :-
   open(File, write, Stream),
@@ -24,7 +27,12 @@ device_path(Port, Basepath, DevicePath) :-
   atomic_concat(Basepath, '*/address', Template),
   expand_(Template, AddressFile),
   file_read(AddressFile, Content), Content = Symbol, !,
-  file_directory_name(AddressFile, DevicePath).
+  file_directory_name(AddressFile, DevicePath),
+  asserta(
+    device_path(Port, Basepath, DevicePath) :-
+      exists_directory(DevicePath);
+      (retract(device_path(Port, Basepath, DevicePath)), fail)
+  ).
 
 detect_port(Port, Prefix, DriverName) :-
   atomic_concat(Prefix, '*/', Template),
@@ -32,7 +40,12 @@ detect_port(Port, Prefix, DriverName) :-
   atomic_concat(Basepath, '/address', AddressFile),
   atomic_concat(Basepath, '/driver_name', DriverFile),
   file_read(DriverFile, DriverName),
-  file_read(AddressFile, Port).
+  file_read(AddressFile, Port),
+  asserta(
+    detect_port(Port, Prefix, DriverName) :-
+      exists_directory(Basepath);
+      (retract(detect_port(Port, Prefix, DriverName)), fail)
+  ).
 
 %! expand_(+F:Wildcard, -E:Path) is nondet
 %
