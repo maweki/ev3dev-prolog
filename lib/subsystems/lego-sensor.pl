@@ -1,33 +1,17 @@
-:- multifile light_sensor/1, ultrasonic_sensor/1, gyro_sensor/1, device_path/2.
-:- dynamic   light_sensor/1, ultrasonic_sensor/1, gyro_sensor/1.
 :- ['../fileaccess.pl'].
 
-light_sensor(P) :- detect_port(P, 'lego-ev3-color').
-ultrasonic_sensor(P) :- detect_port(P, 'lego-ev3-us').
-gyro_sensor(P) :- detect_port(P, 'lego-ev3-gyro').
+light_sensor(P) :- lego_sensor(P, 'lego-ev3-color').
+ultrasonic_sensor(P) :- lego_sensor(P, 'lego-ev3-us').
+gyro_sensor(P) :- lego_sensor(P, 'lego-ev3-gyro').
 
 lego_sensor(Port) :-
-  ev3_uart(Port);
-  nxt_i2c(Port).
+  lego_sensor(Port, _).
+
+lego_sensor(Port, Type, Path) :-
+  subsystem_detect(Port, Type, Path, '/sys/class/lego-sensor/sensor').
 
 lego_sensor(Port, Type) :-
-  lego_sensor(Port),
-  detect_port(Port, Type).
-
-nxt_i2c(_) :-
-  false.
-
-ev3_uart(Port) :-
-  light_sensor(Port);
-  ultrasonic_sensor(Port);
-  gyro_sensor(Port).
-
-detect_port(Port, DriverName) :-
-  detect_port(Port, '/sys/class/lego-sensor/sensor', DriverName).
-
-device_path(Port, DevicePath) :-
-  lego_sensor(Port),!,
-  device_path(Port, '/sys/class/lego-sensor/sensor', DevicePath).
+  lego_sensor(Port, Type, _).
 
 col_ambient(Port, Val) :-
   light_sensor(Port),
@@ -97,18 +81,15 @@ decimals(Port, Decimals) :-
   file_read(File, Decimals).
 
 decimals_file(Port, File) :-
-  lego_sensor(Port),
-  device_path(Port, Basepath),
+  lego_sensor(Port, _, Basepath),
   atomic_concat(Basepath, '/decimals', File).
 
 mode_file(Port, File) :-
-  lego_sensor(Port),
-  device_path(Port, Basepath),
+  lego_sensor(Port, _, Basepath),
   atomic_concat(Basepath, '/mode', File).
 
 value_file(Port, ValueNum, File) :-
-  lego_sensor(Port),
-  device_path(Port, Basepath),
+  lego_sensor(Port, _, Basepath),
   atomic_concat(Basepath, '/value', BaseValuePath),
   atomic_concat(BaseValuePath, ValueNum, File).
 
