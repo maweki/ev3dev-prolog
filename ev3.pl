@@ -40,7 +40,7 @@ go(Speed, Angle) :-
 
 go_cm(Speed, Distance) :-
   robot(WC, _, _, _, _),
-  Angle is round(Distance/WC*360),
+  Angle is round((Distance*360)/(pi*WC)),
   go(Speed,Angle).
 
 turn(Speed, Angle) :-
