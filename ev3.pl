@@ -48,7 +48,7 @@ turn(Speed, Angle) :-
 
 turn(Speed, Angle) :-
   robot(WD, AL, LM, RM, _),
-  MAngle is AL/WD*(Angle/360),
+  MAngle is round(AL/WD*Angle),
   NegMAngle is -MAngle,
   thread_create(motor_run(LM, Speed, MAngle), Id1, []),
   thread_create(motor_run(RM, Speed, NegMAngle), Id2, []),
