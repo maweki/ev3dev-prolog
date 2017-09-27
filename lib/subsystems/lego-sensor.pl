@@ -8,7 +8,7 @@ lego_sensor(Port) :-
   lego_sensor(Port, _).
 
 lego_sensor(Port, Type, Path) :-
-  subsystem_detect(Port, Type, Path, '/sys/class/lego-sensor/sensor').
+  subsystem_detect(Port, Type, Path, '/sys/class/lego-sensor/sensor*').
 
 lego_sensor(Port, Type) :-
   lego_sensor(Port, Type, _).
