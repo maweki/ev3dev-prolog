@@ -9,7 +9,7 @@ set_robot(WheelDiameter, AxleLength, LeftMotor, RightMotor) :-
   tacho_motor(LeftMotor),
   tacho_motor(RightMotor),
   retractall(
-    robot(_, _, _, _, _)
+    robot(_, _, _, _)
   ),
   asserta(
     robot(WheelDiameter, AxleLength, LeftMotor, RightMotor)
