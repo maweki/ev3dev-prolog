@@ -43,7 +43,16 @@ go_cm(Speed, Distance) :-
   go(Speed,Angle).
 
 turn(Speed, Angle) :-
-  gyro_sensor(Port).
+  gyro_sensor(Port),
+  NSpeed is -Speed,
+  stop, gyro_reset(Port),
+  repeat,
+  gyro_ang(Port, ReadAngle),
+  (
+    (ReadAngle = Angle, stop,!);
+    (ReadAngle < Angle, turn(Speed), fail);
+    (ReadAngle > Angle, turn(NSpeed), fail)
+  ).
 
 turn(Speed, Angle) :-
   robot(WD, AL, LM, RM),
@@ -53,3 +62,9 @@ turn(Speed, Angle) :-
   thread_create(motor_run(RM, Speed, NegMAngle), Id2, []),
   thread_join(Id1, true),
   thread_join(Id2, true),!.
+
+turn(Speed) :-
+  robot(_, _, LM, RM),
+  NSpeed is -Speed,
+  motor_run(LM, Speed),
+  motor_run(RM, NSpeed).
