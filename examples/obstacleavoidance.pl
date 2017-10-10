@@ -1,8 +1,10 @@
 :- ['../ev3.pl'].
 
+start :-
+  set_robot(5.6, 10.6, outB, outC),
+  obstacle_avoidance.
+
 obstacle_avoidance :-
-  ((us_dist_cm(in4, Dist), Dist > 50,
-    motor_run(outB, 20), motor_run(outC, 20)
-  );
-  (motor_stop(outC), motor_run(outB, 20, 360))),
+  ((us_dist_cm(_, Dist), Dist > 50, go(20));
+  turn(20, 90)),
   obstacle_avoidance.

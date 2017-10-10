@@ -1,18 +1,18 @@
 :- ['ev3_base.pl'].
 
 % As done by Nalepa
-set_robot(WheelDiameter, AxleLength, LeftMotor, RightMotor) :-
+set_robot(WheelDiameter, AxleLength, LeftMotorPort, RightMotorPort) :-
   nonvar(WheelDiameter),
   nonvar(AxleLength),
-  nonvar(LeftMotor),
-  nonvar(RightMotor),
-  tacho_motor(LeftMotor),
-  tacho_motor(RightMotor),
+  nonvar(LeftMotorPort),
+  nonvar(RightMotorPort),
+  tacho_motor(LeftMotorPort, Type),
+  tacho_motor(RightMotorPort, Type),
   retractall(
     robot(_, _, _, _)
   ),
   asserta(
-    robot(WheelDiameter, AxleLength, LeftMotor, RightMotor)
+    robot(WheelDiameter, AxleLength, LeftMotorPort, RightMotorPort)
   ).
 
 stop :-
