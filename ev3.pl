@@ -48,10 +48,12 @@ turn(Speed, Angle) :-
   stop, gyro_reset(Port),
   repeat,
   gyro_ang(Port, ReadAngle),
+  Diff is round((Angle - ReadAngle) / 3),
+  writeln(Diff),
   (
-    (ReadAngle = Angle, stop,!);
-    (ReadAngle < Angle, turn(Speed), fail);
-    (ReadAngle > Angle, turn(NSpeed), fail)
+    (Diff = 0, stop,!);
+    (Diff > 0, turn(min(Speed, Diff)), fail);
+    (Diff < 0, turn(max(NSpeed, Diff)), fail)
   ).
 
 turn(Speed, Angle) :-
