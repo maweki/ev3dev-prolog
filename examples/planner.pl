@@ -53,30 +53,57 @@ reverse_print_stack(S) :- 	stack(E, Rest, S),
 
 
 /* sample moves */
+obstructed(1,1).
 
-move(move_if_free, [position(X,Y), orientation(DX, DY), not_clear(DX),not_clear(DY)], [del(not_clear(DX)),del(not_clear(DY)),del(position(X,Y)), add(position(X+DX, Y+DY))]).
-move(turn_right, [orientation(0,1)], [del(orientation(0,1)), add(orientation(1,0))]).
+clear(X,Y) :- \+ obstructed(X,Y).
+
+move(move_if_free, [position(X,Y), orientation(DX, DY)], [del(position(X,Y)), add(position(X+DX, Y+DY))]).
+% move_if_free -> [position(0,0),orientation(0,1),clear(0,1)]
+% pickup(a) -> [ontable(b), ontable(c), clear(c), clear(b), holding(a)]
+
+/*Drehung Links*/
 move(turn_left, [orientation(0,1)], [del(orientation(0,1)), add(orientation(-1,0))]).
+move(turn_left, [orientation(-1,0)], [del(orientation(-1,0)), add(orientation(0,-1))]).
+move(turn_left, [orientation(0,-1)], [del(orientation(0,-1)), add(orientation(1,0))]).
+move(turn_left, [orientation(1,0)], [del(orientation(1,0)), add(orientation(0,1))]).
+/*Drehung Rechts*/
+move(turn_right, [orientation(0,1)], [del(orientation(0,1)), add(orientation(1,0))]).
+move(turn_right, [orientation(-1,0)], [del(orientation(-1,0)), add(orientation(0,1))]).
+move(turn_right, [orientation(0,-1)], [del(orientation(0,-1)), add(orientation(-1,0))]).
+move(turn_right, [orientation(1,0)], [del(orientation(1,0)), add(orientation(0,-1))]).
 
-move(pickup(X), [handempty, clear(X), on(X, Y)],
-		[del(handempty), del(clear(X)), del(on(X, Y)),
-				 add(clear(Y)),	add(holding(X))]).
-
-move(pickup(X), [handempty, clear(X), ontable(X)],
-		[del(handempty), del(clear(X)), del(ontable(X)),
-				 add(holding(X))]).
-
-move(putdown(X), [holding(X)],
-		[del(holding(X)), add(ontable(X)), add(clear(X)),
-				  add(handempty)]).
-
-move(stack(X, Y), [holding(X), clear(Y)],
-		[del(holding(X)), del(clear(Y)), add(handempty), add(on(X, Y)),
-				  add(clear(X))]).
+% move(pickup(X), [handempty, clear(X), on(X, Y)],
+% 		[del(handempty), del(clear(X)), del(on(X, Y)),
+% 				 add(clear(Y)),	add(holding(X))]).
+%
+% move(pickup(X), [handempty, clear(X), ontable(X)],
+% 		[del(handempty), del(clear(X)), del(ontable(X)),
+% 				 add(holding(X))]).
+%
+% move(putdown(X), [holding(X)],
+% 		[del(holding(X)), add(ontable(X)), add(clear(X)),
+% 				  add(handempty)]).
+%
+% move(stack(X, Y), [holding(X), clear(Y)],
+% 		[del(holding(X)), del(clear(Y)), add(handempty), add(on(X, Y)),
+% 				  add(clear(X))]).
 
 go(S, G) :- plan(S, G, [S], []).
-test :- go([handempty, ontable(b), ontable(c), on(a, b), clear(c), clear(a)],
- 	          [handempty, ontable(c), on(a,b), on(b, c), clear(a)]).
+test :- go([position(0,3), orientation(1,0)],
+ 	          [position(2,3), orientation(0,1)]).
+
+test2 :- go([position(0,0), orientation(0,1)],
+ 	          [position(2,3), orientation(1,0)]).
+
+test3 :- go([position(2,0), orientation(0,1)],
+ 	          [position(2,3), orientation(0,1)]).
+% move_if_free ->
+% pickup(a) -> [ontable(b), ontable(c), clear(c), clear(b), holding(a)]
+
+% go(S, G) :- plan(S, G, [S], []).
+% test :- go([handempty, ontable(b), ontable(c), on(a, b), clear(c), clear(a)],
+%                  [handempty, ontable(c), on(a,b), on(b, c), clear(a)]).
+
 
 % pickup(a) -> [ontable(b), ontable(c), clear(c), clear(b), holding(a)]
 % pickup(c) -> [ontable(b), on(a, b), clear(a), holding(c)]
