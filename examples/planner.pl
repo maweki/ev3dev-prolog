@@ -1,4 +1,4 @@
-%%%%%%%%% Simple Prolog Planner %%%%%%%%
+e%%%%%%%%% Simple Prolog Planner %%%%%%%%
 %%%
 %%% This is one of the example programs from the textbook:
 %%%
@@ -97,6 +97,8 @@ test2 :- go([position(0,0), orientation(0,1)],
 
 test3 :- go([position(2,0), orientation(0,1)],
  	          [position(2,3), orientation(0,1)]).
+
+%strips([position(2,3),orientation(0,1)],[position(2,0), orientation(0,1)],Plan).
 % move_if_free ->
 % pickup(a) -> [ontable(b), ontable(c), clear(c), clear(b), holding(a)]
 
