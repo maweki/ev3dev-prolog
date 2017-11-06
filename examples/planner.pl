@@ -1,4 +1,4 @@
-e%%%%%%%%% Simple Prolog Planner %%%%%%%%
+%%%%%%%%% Simple Prolog Planner %%%%%%%%
 %%%
 %%% This is one of the example programs from the textbook:
 %%%
@@ -22,14 +22,18 @@ e%%%%%%%%% Simple Prolog Planner %%%%%%%%
 %%% This code has been tested with SWI-Prolog (Multi-threaded, Version 5.2.13)
 %%% and appears to function as intended.
 
-:- [adts].
-plan(State, Goal, _, Moves) :- 	equal_set(State, Goal),
+:- ['adts.pl'].
+
+plan(State, Goal, _, Moves) :-
+				subset(Goal, State),
 				write('moves are'), nl,
 				reverse_print_stack(Moves).
 plan(State, Goal, Been_list, Moves) :-
 				move(Name, Preconditions, Actions),
 				conditions_met(Preconditions, State),
 				change_state(State, Actions, Child_state),
+				% format("~nMoves: ~p",[Moves]),
+				% format("~nThen: ~p",[Child_state]),
 				not(member_state(Child_state, Been_list)),
 				stack(Child_state, Been_list, New_been_list),
 				stack(Name, Moves, New_moves),
@@ -57,7 +61,7 @@ obstructed(1,1).
 
 clear(X,Y) :- \+ obstructed(X,Y).
 
-move(move_if_free, [position(X,Y), orientation(DX, DY)], [del(position(X,Y)), add(position(X+DX, Y+DY))]).
+move(move_if_free, [position(X,Y), orientation(DX, DY), way([X,Y],[TX,TY],[DX,DY])], [del(position(X,Y)), add(position(TX, TY))]).
 % move_if_free -> [position(0,0),orientation(0,1),clear(0,1)]
 % pickup(a) -> [ontable(b), ontable(c), clear(c), clear(b), holding(a)]
 
@@ -89,14 +93,25 @@ move(turn_right, [orientation(1,0)], [del(orientation(1,0)), add(orientation(0,-
 % 				  add(clear(X))]).
 
 go(S, G) :- plan(S, G, [S], []).
-test :- go([position(0,3), orientation(1,0)],
- 	          [position(2,3), orientation(0,1)]).
+test :- bagof(way([PX, PY], [TX, TY], [OX, OY]), way([PX, PY], [TX, TY], [OX, OY]), L),
+	append(L, [position(0,3), orientation(1,0)], Start),
+	go(Start,	[position(2,3), orientation(0,1)]).
 
-test2 :- go([position(0,0), orientation(0,1)],
- 	          [position(2,3), orientation(1,0)]).
+test2 :-
+	bagof(way([PX, PY], [TX, TY], [OX, OY]), way([PX, PY], [TX, TY], [OX, OY]), L),
+	append(L, [position(0,0), orientation(0,1)], Start),
+	go(Start,	[position(2,3), orientation(1,0)]).
 
-test3 :- go([position(2,0), orientation(0,1)],
- 	          [position(2,3), orientation(0,1)]).
+test3 :-
+	bagof(way([PX, PY], [TX, TY], [OX, OY]), way([PX, PY], [TX, TY], [OX, OY]), L),
+	append(L, [position(2,0), orientation(0,1)], Start),
+	go(Start, [position(2,3), orientation(0,1)]).
+
+way([PX, PY], [TX, TY], [OX, OY]) :-
+	between(0,5, PX), between(0,5, PY),
+	between(0,5, TX), between(0,5, TY),
+	between(-1,1, OX), between(-1,1, OY),
+	TX is PX + OX, TY is PY + OY.
 
 %strips([position(2,3),orientation(0,1)],[position(2,0), orientation(0,1)],Plan).
 % move_if_free ->
