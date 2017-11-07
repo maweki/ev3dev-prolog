@@ -73,17 +73,19 @@ strips(Goals, State, Plan, PlanStack, NewState, NewPlan):-
 
   % Op is an Operator that has makes G true
   operator(Op, Preconditions, Adds, Deletes),
+  % format("~n~*c  trying operator: ~p",[Indent,32,Op]),
   member(G,Adds),
+  % format("~n~*c  fits",[Indent,32]),
 
   % fail if we're about to repeat an action during the planing. This
   % hack keeps us from looping at the expense of preventing us from
   % solving some planning problems.
 
-  (\+ member(Op, PlanStack)),
+  %(\+ member(Op, PlanStack)),
 
   % Try to achieve Op's preconditions via a recursive call to strips
 
-%  dbug("~n~*cAchieve ~p via ~p with preconds: ~p",[Indent,32,G, Op,Preconditions]),
+  format("~n~*cAchieve ~p via ~p with preconds: ~p",[Indent,32,G, Op,Preconditions]),
   strips(Preconditions, State, Plan, [Op|PlanStack], TmpState1, TmpPlan1),
 
   % Now that the preconditions have been satisfied, 'do' the action
@@ -112,7 +114,7 @@ strips and several other simple planners.  Define a test case using
 init_state/2 and goal/2 predicates.  Here's test case 11:
 
   init_state(11, [on(a,b), clear(a), ...]).
-  goal(11, [ontable(a), ontable(b)]).
+  goal(11, [ontable(trying operator: ~pa), ontable(b)]).
 
 *********************************************************************** */
 
@@ -139,7 +141,7 @@ writeplan([A|B]):-
 
 
   %operator(Op, Preconditions, Adds, Deletes), member(G,Adds),
-  operator(move_if_free, [position(X,Y), orientation(DX, DY)],[position(X+DX, Y+DY)], [position(X,Y)]).
+  operator(move_if_free, [orientation(DX, DY), position(X-DX,Y-DY)],[position(X, Y)], [position(X-DX,Y-DY)]).
 
   /*Drehung Links*/
   operator(turn_left, [orientation(0,1)],[orientation(-1,0)] ,[orientation(0,1)]).
@@ -151,3 +153,5 @@ writeplan([A|B]):-
   operator(turn_right, [orientation(-1,0)],[orientation(0,1)], [orientation(-1,0)]).
   operator(turn_right, [orientation(0,-1)],[orientation(-1,0)], [orientation(0,-1)]).
   operator(turn_right, [orientation(1,0)],[orientation(0,-1)], [orientation(1,0)]).
+
+% strips([position(2,3),orientation(0,1)],[position(2,0), orientation(0,1)],Plan).

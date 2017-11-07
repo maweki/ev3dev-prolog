@@ -22,18 +22,14 @@
 %%% This code has been tested with SWI-Prolog (Multi-threaded, Version 5.2.13)
 %%% and appears to function as intended.
 
-:- ['adts.pl'].
-
-plan(State, Goal, _, Moves) :-
-				subset(Goal, State),
+:- [adts].
+plan(State, Goal, _, Moves) :- 	equal_set(State, Goal),
 				write('moves are'), nl,
 				reverse_print_stack(Moves).
 plan(State, Goal, Been_list, Moves) :-
 				move(Name, Preconditions, Actions),
 				conditions_met(Preconditions, State),
 				change_state(State, Actions, Child_state),
-				% format("~nMoves: ~p",[Moves]),
-				% format("~nThen: ~p",[Child_state]),
 				not(member_state(Child_state, Been_list)),
 				stack(Child_state, Been_list, New_been_list),
 				stack(Name, Moves, New_moves),
@@ -61,7 +57,7 @@ obstructed(1,1).
 
 clear(X,Y) :- \+ obstructed(X,Y).
 
-move(move_if_free, [position(X,Y), orientation(DX, DY), way([X,Y],[TX,TY],[DX,DY])], [del(position(X,Y)), add(position(TX, TY))]).
+move(move_if_free, [position(X,Y), orientation(DX, DY)], [del(position(X,Y)), add(position(X+DX, Y+DY))]).
 % move_if_free -> [position(0,0),orientation(0,1),clear(0,1)]
 % pickup(a) -> [ontable(b), ontable(c), clear(c), clear(b), holding(a)]
 
