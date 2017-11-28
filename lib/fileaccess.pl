@@ -11,7 +11,7 @@ file_read(File, Content) :-
   open(File, read, Stream),
   read_line_to_codes(Stream, Codes),
   atom_codes(Ca, Codes),
-  ( atom_number(Ca, Content);
+  ( (atom_number(Ca, Content),!);
     Content = Ca % try to split this up for list-like results
   ),
   catch(close(Stream), _, true).
