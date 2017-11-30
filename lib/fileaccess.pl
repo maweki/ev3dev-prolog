@@ -5,16 +5,16 @@ file_write(File, Content) :-
   open(File, write, Stream),
   write(Stream, Content),
   flush_output(Stream),
-  catch(close(Stream), _, true).
+  close(Stream).
 
 file_read(File, Content) :-
   open(File, read, Stream),
   read_line_to_codes(Stream, Codes),
+  close(Stream),
   atom_codes(Ca, Codes),
   ( (atom_number(Ca, Content),!);
     Content = Ca % try to split this up for list-like results
-  ),
-  catch(close(Stream), _, true).
+  ).
 
 try_split_list(String, Result) :-
   String = Result.
