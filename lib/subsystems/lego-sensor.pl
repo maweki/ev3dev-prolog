@@ -3,6 +3,7 @@
 light_sensor(P) :- lego_sensor(P, 'lego-ev3-color').
 ultrasonic_sensor(P) :- lego_sensor(P, 'lego-ev3-us').
 gyro_sensor(P) :- lego_sensor(P, 'lego-ev3-gyro').
+touch_sensor(P) :- lego_sensor(P, 'lego-ev3-touch').
 
 lego_sensor(Port) :-
   lego_sensor(Port, _).
@@ -74,6 +75,11 @@ us_dist_inches(Port, Val) :-
 us_listen(Port, Val) :-
   ultrasonic_sensor(Port),
   mode(Port, 'US-LISTEN'),
+  value(Port, 0, Val).
+
+touch(Port, Val) :-
+  touch_sensor(Port),
+  mode(Port, 'TOUCH'),
   value(Port, 0, Val).
 
 decimals(Port, Decimals) :-
