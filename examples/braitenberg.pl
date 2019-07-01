@@ -1,14 +1,16 @@
 :- ['../ev3.pl'].
 
-% Licht wird nur von einem der beiden Sensoren verwendet und auf beide motoren übertragen.
-% Je mehr Licht desto schneller das Vehikel
+% See https://en.wikipedia.org/wiki/Braitenberg_vehicle for more information
+
+% Light only used from one sensor and transfered to both motors
+% The more light, the faster the vehicle
 braitenberg1a :-
   col_ambient(_, Light),
   forall(tacho_motor(M), motor_run(M, Light)),
   braitenberg1a.
 
-% Licht wird nur von einem der beiden Sensoren verwendet und auf beide motoren übertragen.
-% Je mehr licht um so schneller, wenn Licht > 50 sollte das Vehikel rückwärts fahren.
+% Light only used from one sensor and transfered to both motors
+% The more light, the faster the vehicle. If the light level is greater than 50 the vehicle goes backwards.
 braitenberg1b :-
   col_ambient(_, Light),
   ((Light < 50,
@@ -23,22 +25,22 @@ braitenberg1c :-
   forall(tacho_motor(M), motor_run(M, Speed)),
   braitenberg1c.
 
-% Je mehr Licht desto schneller das Vehikel, Motor Sensor Abhänigkeit
-% Für braitenberg2b, am Roboter Ports von Motoren ODER Sensoren tauschen
+% The more light, the faster the vehicle.
+% The vehicle either turns towards the light or away from it. Switch motor or sensor ports (in software or physically) to change the behaviour
 braitenberg2 :-
   col_ambient(in2, LightR), motor_run(outB, LightR),
   col_ambient(in3, LightL), motor_run(outC, LightL),
   braitenberg2.
 
-% Je mehr Licht desto langsamer das Vehikel, Motor Sensor Abhänigkeit
-% Für braitenberg3b, am Roboter Ports von Motoren ODER Sensoren tauschen
+% The more light, the slower the vehicle.
+% For braitenberg 3b, switch sensors or motors
 braitenberg3 :-
   col_ambient(in2, LightR), SpeedR is max(0, 50 - LightR),
   col_ambient(in3, LightL), SpeedL is max(0, 50 - LightL),
   motor_run(outB, SpeedR), motor_run(outC, SpeedL),
   braitenberg3.
 
-%Je mehr Licht umso schneller bis Licht > 50, dann je mehr Licht langsamer
+% The more light, the faster the vehicle. If the light level is greater than 50 the vehicle goes slower.
 braitenberg4 :-
   col_ambient(in2, LightR),
   col_ambient(in3, LightL),
@@ -53,7 +55,7 @@ braitenberg4 :-
   motor_run(outB, SpeedR), motor_run(outC, SpeedL),
 braitenberg4.
 
-% Vehikel fährt mit konstanter Geschwindigkeit(100), bis Licht > 60, dann Motor(en) (fast) volle Leistung rückwärts
+% Vehicle goes with constant speed, up until light level 60 and then it goes backwards
 braitenberg5 :-
   col_ambient(in2, LightR),
   col_ambient(in3, LightL),
