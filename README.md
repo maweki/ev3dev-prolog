@@ -6,10 +6,10 @@ This is a ev3dev-based API for Prolog using the readily available swi-Prolog.
 
 * write [ev3dev](https://ev3dev.org) to an SD card and launch ev3dev on your brick
 * ssh into the brick
-* install swi-Prolog using `sudo apt-get install swi-prolog`. This takes some time.
+* install swi-Prolog using `sudo apt update && sudo apt-get install swi-prolog`. This takes some time.
 * clone this repository onto your brick and you're good to go.
 
-## Examples
+## Examples and Programming
 
 Interactive mode can be started using `swipl ev3_base.pl` for the low level API with sensor and actor controls similar to the base EV3 software or other ev3dev APIs, and `swipl ev3.pl` for the high level abstraction which is on a similar level as OpenRoberta or others (in that it includes an internal robot model).
 
@@ -36,7 +36,17 @@ The high level abstraction uses an internal robot model. The predicate `set_robo
 
 ### Programming Hints
 
-If you want to write robot programs that run forever, you have two ways to do that using the Prolog evaluation Scheme (SLD-Resolution): Using the predicate [repeat](https://www.swi-prolog.org/pldoc/man?predicate=repeat/0) (which always succeeds and creates an infinite amount of choice points) you get as resolution tree that is infinitely wide. Or using recursion (`a :- a.` is an infinite derivation) that doesn't end. Using the latter method be careful to use a cut before the recursion stap as to not leave choice points on recursing. Leftover choice points can fill up your limited program memory very fast. In our experience a mix of those two methods with the recursion into the subgoals as program states and `repeat` as interactivity control leads to the most readable code.
+If you want to write robot programs that run forever, you have two ways to do that using the Prolog evaluation Scheme (SLD-Resolution):
+Using the predicate [repeat](https://www.swi-prolog.org/pldoc/man?predicate=repeat/0) (which always succeeds and creates an infinite amount of choice points) you get as resolution tree that is infinitely wide. Or using recursion (`a :- a.` is an infinite derivation) that doesn't end.
+Using the latter method be careful to use a cut before the recursion step as to not leave choice points on recursing.
+Leftover choice points can fill up your limited program memory very fast.
+In our experience a mix of those two methods with the recursion into the subgoals as program states and `repeat` as interactivity control leads to the most readable code.
+
+## Missing Sensors
+
+We only implemented sensors that were readily available to us.
+You can easily add your own sensors by using the implemented ones as a template.
+We welcome pull-requests.
 
 ## Publications
 
