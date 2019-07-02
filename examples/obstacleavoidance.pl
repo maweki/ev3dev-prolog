@@ -1,7 +1,7 @@
 :- ['../ev3.pl'].
 
 start :-
-  set_robot(5.6, 10.6, outB, outC),
+  set_robot(5.6, 10.6, 'ev3-ports:outB', 'ev3-ports:outC'),
   obstacle_avoidance.
 
 obstacle_avoidance :-
