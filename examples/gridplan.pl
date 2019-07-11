@@ -7,6 +7,7 @@
 
 setup :-
   set_robot(5.6, 10.6, 'ev3-ports:outB', 'ev3-ports:outC'),!,
+  retractall(state_position(_, _)),
   asserta(state_position([0,0],[0,1])).
 
 plan_and_go_to([TX, TY], [DX, DY]) :-
