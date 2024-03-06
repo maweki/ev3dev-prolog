@@ -63,5 +63,5 @@ braitenberg5 :-
     SpeedR is 40),
   ((LightL > 50, SpeedL is 100);
     SpeedL is 40),
-  motor_run('ev3-ports:'ev3-ports:outB'', SpeedL), motor_run('ev3-ports:outC', SpeedR), sleep(1),
+  motor_run('ev3-ports:outB', SpeedL), motor_run('ev3-ports:outC', SpeedR), sleep(1),
 braitenberg5.
